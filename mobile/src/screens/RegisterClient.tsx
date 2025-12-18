@@ -29,7 +29,7 @@ export default function RegisterClient() {
     });
 
     const handleRegister = () => {
-        if (!name) return;
+        if (!name || !address || !phone) return;
         mutation.mutate({ name, address, phone });
     };
 
@@ -53,6 +53,7 @@ export default function RegisterClient() {
                 mode="outlined"
                 style={styles.input}
             />
+            {!address && <HelperText type="error">Address is required</HelperText>}
 
             <TextInput
                 label="Phone Number"
@@ -62,12 +63,13 @@ export default function RegisterClient() {
                 keyboardType="phone-pad"
                 style={styles.input}
             />
+            {!phone && <HelperText type="error">Phone number is required</HelperText>}
 
             <Button
                 mode="contained"
                 onPress={handleRegister}
                 loading={mutation.isPending}
-                disabled={!name || mutation.isPending}
+                disabled={!name || !address || !phone || mutation.isPending}
                 style={styles.button}
             >
                 Register Client

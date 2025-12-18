@@ -81,9 +81,13 @@ export default function CreateLoan() {
                                 type="date"
                                 value={format(loanDate, 'yyyy-MM-dd')}
                                 onChange={(e) => {
-                                    const date = new Date(e.target.value);
-                                    if (!isNaN(date.getTime())) {
-                                        setLoanDate(date);
+                                    const val = e.target.value;
+                                    if (val) {
+                                        const [y, m, d] = val.split('-').map(Number);
+                                        const newDate = new Date(y, m - 1, d);
+                                        if (!isNaN(newDate.getTime())) {
+                                            setLoanDate(newDate);
+                                        }
                                     }
                                 }}
                                 style={{

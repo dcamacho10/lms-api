@@ -4,8 +4,8 @@ import { relations } from "drizzle-orm";
 export const clients = pgTable("clients", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
-  address: text("address"),
-  phone: varchar("phone", { length: 20 }),
+  address: text("address").notNull(),
+  phone: varchar("phone", { length: 20 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
