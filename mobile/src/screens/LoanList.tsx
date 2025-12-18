@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView, FlatList } from 'react-native';
-import { Card, Title, Paragraph, Button, Text, ActivityIndicator, Divider } from 'react-native-paper';
+import { Card, Title, Paragraph, Button, Text, ActivityIndicator, Divider, Snackbar } from 'react-native-paper';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getActiveLoans, payLoan, payFee } from '../api';
+import { getActiveLoans, payLoan, payFee, applyFees } from '../api';
 import { format } from 'date-fns';
 
 export default function LoanList() {
@@ -27,12 +27,32 @@ export default function LoanList() {
         },
     });
 
+    const jobMutation = useMutation({
+        mutationFn: applyFees,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['loans'] });
+        },
+    });
+
     const totalOwed = loans?.reduce((sum: number, loan: any) => sum + loan.totalOwed, 0) || 0;
 
     if (isLoading) return <ActivityIndicator style={styles.loader} />;
 
     return (
         <View style={styles.container}>
+            <View style={styles.headerRow}>
+                <Title style={styles.title}>Active Loans</Title>
+                <Button
+                    mode="outlined"
+                    onPress={() => jobMutation.mutate()}
+                    icon="refresh"
+                    loading={jobMutation.isPending}
+                    compact
+                >
+                    Apply Fees
+                </Button>
+            </View>
+
             <Card style={styles.summaryCard}>
                 <Card.Content>
                     <Title>Total Owed</Title>
@@ -75,32 +95,43 @@ export default function LoanList() {
                                             </View>
                                             <Text style={styles.feeAmount}>${parseFloat(fee.amount).toFixed(2)}</Text>
                                             <Button
-                                                mode="text"
+                                                mode="outlined"
                                                 compact
                                                 onPress={() => feePayMutation.mutate(fee.id)}
                                                 loading={feePayMutation.isPending && feePayMutation.variables === fee.id}
+                                                style={styles.payFeeBtn}
+                                                labelStyle={{ fontSize: 11 }}
                                             >
-                                                Pay
+                                                Pay Fee
                                             </Button>
                                         </View>
                                     ))}
                                 </View>
                             )}
                         </Card.Content>
-                        <Card.Actions>
+                        <Card.Actions style={styles.loanActions}>
                             <Button
                                 mode="contained"
                                 onPress={() => payMutation.mutate(item.id)}
                                 loading={payMutation.isPending && payMutation.variables === item.id}
+                                style={styles.payFullBtn}
                             >
-                                Pay in Full
+                                Pay Loan in Full
                             </Button>
                         </Card.Actions>
                     </Card>
                 )}
-                ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+                ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
                 ListEmptyComponent={<Text style={styles.empty}>No active loans found.</Text>}
             />
+
+            <Snackbar
+                visible={jobMutation.isSuccess}
+                onDismiss={() => jobMutation.reset()}
+                duration={3000}
+            >
+                Fees updated and applied!
+            </Snackbar>
         </View>
     );
 }
@@ -177,5 +208,23 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: 'bold',
         marginHorizontal: 10,
+        color: '#d32f2f',
+    },
+    headerRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    payFeeBtn: {
+        borderColor: '#6200ee',
+    },
+    loanActions: {
+        justifyContent: 'flex-end',
+        paddingHorizontal: 16,
+        paddingBottom: 8,
+    },
+    payFullBtn: {
+        width: '100%',
     },
 });

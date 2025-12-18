@@ -42,3 +42,8 @@ export const payFee = async (feeId: number) => {
     const response = await api.post(`/fees/${feeId}/pay`);
     return response.data;
 };
+
+export const applyFees = async () => {
+    const response = await api.post('/jobs/apply-fees');
+    return response.data;
+};
