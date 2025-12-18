@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, Platform, TouchableOpacity } from 'react-native';
-import { TextInput, Button, Title, Snackbar, List, Portal, Modal, Text } from 'react-native-paper';
+import { TextInput, Button, Title, Snackbar, List, Portal, Modal, Text, Card, Divider } from 'react-native-paper';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createLoan, getClients } from '../api';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -60,63 +60,100 @@ export default function CreateLoan() {
         <ScrollView contentContainerStyle={styles.container}>
             <Title style={styles.title}>Create New Loan</Title>
 
-            <Button
-                mode="outlined"
-                onPress={() => setModalVisible(true)}
-                style={styles.selectButton}
-            >
-                {selectedClient ? `Client: ${selectedClient.name}` : 'Select Client'}
-            </Button>
-
-            <Text style={styles.label}>Loan Start Date:</Text>
-            <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.datePickerButton}>
-                <View pointerEvents="none">
-                    <TextInput
-                        value={format(loanDate, 'PPPP')}
-                        editable={false}
+            <Card style={styles.formCard}>
+                <Card.Content>
+                    <Text style={styles.label}>1. Select Client</Text>
+                    <Button
                         mode="outlined"
-                        right={<TextInput.Icon icon="calendar" />}
+                        onPress={() => setModalVisible(true)}
+                        style={styles.selectButton}
+                        icon="account-search"
+                    >
+                        {selectedClient ? selectedClient.name : 'Choose a Client'}
+                    </Button>
+
+                    <Divider style={styles.divider} />
+
+                    <Text style={styles.label}>2. Loan Start Date</Text>
+                    {Platform.OS === 'web' ? (
+                        <View style={styles.webDateWrapper}>
+                            <input
+                                type="date"
+                                value={format(loanDate, 'yyyy-MM-dd')}
+                                onChange={(e) => {
+                                    const date = new Date(e.target.value);
+                                    if (!isNaN(date.getTime())) {
+                                        setLoanDate(date);
+                                    }
+                                }}
+                                style={{
+                                    width: '100%',
+                                    padding: '12px',
+                                    fontSize: '16px',
+                                    borderRadius: '4px',
+                                    border: '1px solid rgba(0,0,0,0.2)',
+                                    marginBottom: '20px',
+                                    fontFamily: 'inherit'
+                                }}
+                            />
+                        </View>
+                    ) : (
+                        <TouchableOpacity
+                            onPress={() => setShowDatePicker(true)}
+                            style={styles.dateSelector}
+                            activeOpacity={0.7}
+                        >
+                            <View style={styles.dateInfo}>
+                                <Text style={styles.dateValue}>{format(loanDate, 'PPPP')}</Text>
+                                <Text style={styles.dateHint}>Tap to change start date</Text>
+                            </View>
+                            <TextInput.Icon icon="calendar" color="#6200ee" />
+                        </TouchableOpacity>
+                    )}
+
+                    {showDatePicker && (
+                        <DateTimePicker
+                            value={loanDate}
+                            mode="date"
+                            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                            onChange={onDateChange}
+                        />
+                    )}
+
+                    <Divider style={styles.divider} />
+
+                    <Text style={styles.label}>3. Loan Amount & Fee</Text>
+                    <TextInput
+                        label="Loan Amount"
+                        value={amount}
+                        onChangeText={setAmount}
+                        mode="outlined"
+                        keyboardType="numeric"
+                        style={styles.input}
+                        left={<TextInput.Affix text="$" />}
                     />
-                </View>
-            </TouchableOpacity>
 
-            {showDatePicker && (
-                <DateTimePicker
-                    value={loanDate}
-                    mode="date"
-                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                    onChange={onDateChange}
-                />
-            )}
-
-            <TextInput
-                label="Loan Amount"
-                value={amount}
-                onChangeText={setAmount}
-                mode="outlined"
-                keyboardType="numeric"
-                style={styles.input}
-                left={<TextInput.Affix text="$" />}
-            />
-
-            <TextInput
-                label="Monthly Fee (%)"
-                value={feeRate}
-                onChangeText={setFeeRate}
-                mode="outlined"
-                keyboardType="numeric"
-                style={styles.input}
-                right={<TextInput.Affix text="%" />}
-            />
+                    <TextInput
+                        label="Monthly Fee (%)"
+                        value={feeRate}
+                        onChangeText={setFeeRate}
+                        mode="outlined"
+                        keyboardType="numeric"
+                        style={styles.input}
+                        right={<TextInput.Affix text="%" />}
+                    />
+                </Card.Content>
+            </Card>
 
             <Button
                 mode="contained"
                 onPress={handleCreate}
                 loading={mutation.isPending}
                 disabled={!selectedClient || !amount || mutation.isPending}
-                style={styles.button}
+                style={styles.sumbitButton}
+                contentStyle={{ height: 50 }}
             >
-                Issue Loan
+                Issue Loan Now
             </Button>
 
             <Portal>
@@ -171,19 +208,54 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 14,
+        fontWeight: 'bold',
         color: '#666',
-        marginBottom: 4,
+        marginBottom: 8,
     },
-    datePickerButton: {
+    divider: {
+        marginVertical: 20,
+        backgroundColor: 'rgba(0,0,0,0.05)',
+    },
+    formCard: {
+        backgroundColor: 'white',
+        borderRadius: 12,
+        elevation: 2,
         marginBottom: 20,
+    },
+    dateSelector: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: 12,
+        backgroundColor: '#f1f1f1',
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: 'rgba(0,0,0,0.1)',
+    },
+    dateInfo: {
+        flex: 1,
+    },
+    dateValue: {
+        fontSize: 16,
+        fontWeight: '500',
+        color: '#333',
+    },
+    dateHint: {
+        fontSize: 12,
+        color: '#888',
+        marginTop: 2,
+    },
+    webDateWrapper: {
+        marginBottom: 10,
     },
     selectButton: {
-        marginBottom: 20,
-        paddingVertical: 5,
+        marginBottom: 10,
+        paddingVertical: 4,
     },
-    button: {
+    sumbitButton: {
         marginTop: 10,
-        paddingVertical: 5,
+        marginBottom: 30,
+        borderRadius: 8,
     },
     modal: {
         backgroundColor: 'white',
