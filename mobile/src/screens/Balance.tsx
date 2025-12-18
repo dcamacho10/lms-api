@@ -24,22 +24,42 @@ export default function Balance() {
             <View style={styles.summaryRow}>
                 <Surface style={[styles.summaryCard, { backgroundColor: '#f3e5f5' }]} elevation={1}>
                     <TrendingDown size={24} color="#7b1fa2" />
-                    <Text style={styles.summaryLabel}>Total Loaned</Text>
-                    <Text style={styles.summaryValue}>${data?.totalLoaned.toFixed(2)}</Text>
+                    <Text style={styles.summaryLabel} numberOfLines={1}>Total Loaned</Text>
+                    <Text
+                        style={styles.summaryValue}
+                        numberOfLines={1}
+                        adjustsFontSizeToFit
+                    >
+                        ${(data?.totalLoaned || 0).toFixed(2)}
+                    </Text>
                 </Surface>
+
+                <View style={{ width: 15 }} />
 
                 <Surface style={[styles.summaryCard, { backgroundColor: '#e8f5e9' }]} elevation={1}>
                     <TrendingUp size={24} color="#2e7d32" />
-                    <Text style={styles.summaryLabel}>Total Earnings</Text>
-                    <Text style={styles.summaryValue}>${data?.totalEarnings.toFixed(2)}</Text>
+                    <Text style={styles.summaryLabel} numberOfLines={1}>Total Earnings</Text>
+                    <Text
+                        style={styles.summaryValue}
+                        numberOfLines={1}
+                        adjustsFontSizeToFit
+                    >
+                        ${(data?.totalEarnings || 0).toFixed(2)}
+                    </Text>
                 </Surface>
             </View>
 
             <Surface style={styles.recoveredCard} elevation={1}>
                 <DollarSign size={20} color="#0288d1" />
-                <View style={{ marginLeft: 10 }}>
-                    <Text style={styles.recoveredLabel}>Recovered Capital (Principal Returned)</Text>
-                    <Text style={styles.recoveredValue}>${data?.totalRecovered.toFixed(2)}</Text>
+                <View style={{ flex: 1, marginLeft: 10 }}>
+                    <Text style={styles.recoveredLabel}>Recovered Principal</Text>
+                    <Text
+                        style={styles.recoveredValue}
+                        numberOfLines={1}
+                        adjustsFontSizeToFit
+                    >
+                        ${(data?.totalRecovered || 0).toFixed(2)}
+                    </Text>
                 </View>
             </Surface>
 
@@ -72,18 +92,34 @@ export default function Balance() {
                     <View style={styles.dataRow}>
                         <View style={styles.dataItem}>
                             <Text style={styles.dataLabel}>Issued</Text>
-                            <Text style={[styles.dataValue, { color: '#666' }]}>${item.loaned.toFixed(2)}</Text>
+                            <Text
+                                style={[styles.dataValue, { color: '#666' }]}
+                                numberOfLines={1}
+                                adjustsFontSizeToFit
+                            >
+                                ${(item.loaned || 0).toFixed(2)}
+                            </Text>
                         </View>
 
                         <View style={styles.dataItem}>
                             <Text style={styles.dataLabel}>Recovered</Text>
-                            <Text style={[styles.dataValue, { color: '#0288d1' }]}>${item.recovered.toFixed(2)}</Text>
+                            <Text
+                                style={[styles.dataValue, { color: '#0288d1' }]}
+                                numberOfLines={1}
+                                adjustsFontSizeToFit
+                            >
+                                ${(item.recovered || 0).toFixed(2)}
+                            </Text>
                         </View>
 
                         <View style={styles.dataItem}>
                             <Text style={[styles.dataLabel, { textAlign: 'right' }]}>Earnings</Text>
-                            <Text style={[styles.dataValue, { textAlign: 'right', color: '#2e7d32' }]}>
-                                +${item.earnings.toFixed(2)}
+                            <Text
+                                style={[styles.dataValue, { textAlign: 'right', color: '#2e7d32' }]}
+                                numberOfLines={1}
+                                adjustsFontSizeToFit
+                            >
+                                +${(item.earnings || 0).toFixed(2)}
                             </Text>
                         </View>
                     </View>
@@ -124,7 +160,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     summaryCard: {
-        width: (screenWidth - 50) / 2,
+        flex: 1,
         padding: 15,
         borderRadius: 12,
         alignItems: 'center',
