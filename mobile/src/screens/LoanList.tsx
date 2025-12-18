@@ -17,6 +17,7 @@ export default function LoanList() {
         mutationFn: payLoan,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['loans'] });
+            queryClient.invalidateQueries({ queryKey: ['stats'] });
         },
     });
 
@@ -24,6 +25,7 @@ export default function LoanList() {
         mutationFn: payFee,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['loans'] });
+            queryClient.invalidateQueries({ queryKey: ['stats'] });
         },
     });
 
@@ -31,6 +33,7 @@ export default function LoanList() {
         mutationFn: applyFees,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['loans'] });
+            queryClient.invalidateQueries({ queryKey: ['stats'] });
         },
     });
 

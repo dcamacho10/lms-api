@@ -17,6 +17,7 @@ export const loans = pgTable("loans", {
   dueDate: timestamp("due_date").notNull(),
   paid: boolean("paid").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const fees = pgTable("fees", {
@@ -26,6 +27,7 @@ export const fees = pgTable("fees", {
   type: varchar("type", { length: 20 }).$type<"monthly" | "daily">().notNull(),
   isPaid: boolean("is_paid").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const clientsRelations = relations(clients, ({ many }) => ({

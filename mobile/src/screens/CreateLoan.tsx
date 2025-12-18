@@ -26,6 +26,7 @@ export default function CreateLoan() {
         mutationFn: createLoan,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['loans'] });
+            queryClient.invalidateQueries({ queryKey: ['stats'] });
             setMsg('Loan created successfully!');
             setVisible(true);
             setAmount('');

@@ -6,21 +6,24 @@ import { theme } from './src/theme';
 import RegisterClient from './src/screens/RegisterClient';
 import CreateLoan from './src/screens/CreateLoan';
 import LoanList from './src/screens/LoanList';
+import Balance from './src/screens/Balance';
 
 const queryClient = new QueryClient();
 
 export default function App() {
-  const [index, setIndex] = useState(0);
-  const [routes] = useState([
-    { key: 'loans', title: 'Loans', focusedIcon: 'format-list-bulleted', unfocusedIcon: 'format-list-bulleted' },
-    { key: 'register', title: 'Client+', focusedIcon: 'account-plus', unfocusedIcon: 'account-plus-outline' },
-    { key: 'create', title: 'Loan+', focusedIcon: 'cash-plus', unfocusedIcon: 'cash' },
+  const [index, setIndex] = React.useState(0);
+  const [routes] = React.useState([
+    { key: 'loans', title: 'Loans', focusedIcon: 'format-list-bulleted' },
+    { key: 'create', title: 'Loan+', focusedIcon: 'plus-box' },
+    { key: 'register', title: 'Client+', focusedIcon: 'account-plus' },
+    { key: 'balance', title: 'Balance', focusedIcon: 'chart-bar' },
   ]);
 
   const renderScene = BottomNavigation.SceneMap({
     loans: LoanList,
-    register: RegisterClient,
     create: CreateLoan,
+    register: RegisterClient,
+    balance: Balance,
   });
 
   return (

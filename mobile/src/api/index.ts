@@ -47,3 +47,8 @@ export const applyFees = async () => {
     const response = await api.post('/jobs/apply-fees');
     return response.data;
 };
+
+export const getYearlyBalance = async () => {
+    const response = await api.get('/stats/balance');
+    return response.data;
+};

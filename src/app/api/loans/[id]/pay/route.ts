@@ -37,7 +37,10 @@ export async function POST(
 
         const [updatedLoan] = await db
             .update(loans)
-            .set({ paid: true })
+            .set({
+                paid: true,
+                updatedAt: new Date()
+            })
             .where(eq(loans.id, loanId))
             .returning();
 
