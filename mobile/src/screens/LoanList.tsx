@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet, ScrollView, FlatList } from 'react-native';
 import { Card, Title, Paragraph, Button, Text, ActivityIndicator, Divider } from 'react-native-paper';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getActiveLoans, payLoan } from '../api';
+import { getActiveLoans, payLoan, payFee } from '../api';
 import { format } from 'date-fns';
 
 export default function LoanList() {
@@ -15,6 +15,13 @@ export default function LoanList() {
 
     const payMutation = useMutation({
         mutationFn: payLoan,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['loans'] });
+        },
+    });
+
+    const feePayMutation = useMutation({
+        mutationFn: payFee,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['loans'] });
         },
@@ -52,6 +59,33 @@ export default function LoanList() {
                             <Paragraph>Fees Accumulated: ${item.fees.toFixed(2)}</Paragraph>
                             <Paragraph>Total to Pay: ${item.totalOwed.toFixed(2)}</Paragraph>
                             <Paragraph>Due Date: {format(new Date(item.dueDate), 'MMM dd, yyyy')}</Paragraph>
+
+                            {item.unpaidFeesList?.length > 0 && (
+                                <View style={styles.feesSection}>
+                                    <Text style={styles.feesTitle}>Unpaid Fees:</Text>
+                                    {item.unpaidFeesList.map((fee: any) => (
+                                        <View key={fee.id} style={styles.feeRow}>
+                                            <View style={{ flex: 1 }}>
+                                                <Text style={styles.feeTypeText}>
+                                                    {fee.type === 'monthly' ? 'Monthly Fee' : 'Penalty'}
+                                                </Text>
+                                                <Text style={styles.feeDateText}>
+                                                    {format(new Date(fee.createdAt), 'MMM dd')}
+                                                </Text>
+                                            </View>
+                                            <Text style={styles.feeAmount}>${parseFloat(fee.amount).toFixed(2)}</Text>
+                                            <Button
+                                                mode="text"
+                                                compact
+                                                onPress={() => feePayMutation.mutate(fee.id)}
+                                                loading={feePayMutation.isPending && feePayMutation.variables === fee.id}
+                                            >
+                                                Pay
+                                            </Button>
+                                        </View>
+                                    ))}
+                                </View>
+                            )}
                         </Card.Content>
                         <Card.Actions>
                             <Button
@@ -110,5 +144,38 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop: 20,
         color: '#666',
+    },
+    feesSection: {
+        marginTop: 15,
+        paddingTop: 10,
+        borderTopWidth: 1,
+        borderTopColor: '#eee',
+    },
+    feesTitle: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        marginBottom: 8,
+        color: '#444',
+    },
+    feeRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 8,
+        backgroundColor: '#f9f9f9',
+        padding: 8,
+        borderRadius: 4,
+    },
+    feeTypeText: {
+        fontSize: 13,
+        fontWeight: '500',
+    },
+    feeDateText: {
+        fontSize: 11,
+        color: '#888',
+    },
+    feeAmount: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        marginHorizontal: 10,
     },
 });

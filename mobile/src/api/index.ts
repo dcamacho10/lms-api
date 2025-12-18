@@ -37,3 +37,8 @@ export const payLoan = async (loanId: number) => {
     const response = await api.post(`/loans/${loanId}/pay`);
     return response.data;
 };
+
+export const payFee = async (feeId: number) => {
+    const response = await api.post(`/fees/${feeId}/pay`);
+    return response.data;
+};

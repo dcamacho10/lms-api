@@ -22,18 +22,22 @@ export async function GET() {
         // For each loan, get unpaid fees
         const results = await Promise.all(
             activeLoans.map(async (loan) => {
-                const unpaidFees = await db
+                const unpaidFeesList = await db
                     .select({
+                        id: fees.id,
                         amount: fees.amount,
+                        type: fees.type,
+                        createdAt: fees.createdAt,
                     })
                     .from(fees)
                     .where(and(eq(fees.loanId, loan.id), eq(fees.isPaid, false)));
 
-                const totalFees = unpaidFees.reduce((sum, f) => sum + parseFloat(f.amount), 0);
+                const totalFees = unpaidFeesList.reduce((sum, f) => sum + parseFloat(f.amount), 0);
                 return {
                     ...loan,
                     totalOwed: parseFloat(loan.principal) + totalFees,
                     fees: totalFees,
+                    unpaidFeesList: unpaidFeesList,
                 };
             })
         );

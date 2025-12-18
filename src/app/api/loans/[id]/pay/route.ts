@@ -7,10 +7,11 @@ export const runtime = "nodejs";
 
 export async function POST(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const loanId = parseInt(params.id);
+        const { id } = await params;
+        const loanId = parseInt(id);
 
         if (isNaN(loanId)) {
             return NextResponse.json({ error: "Invalid loan ID" }, { status: 400 });
