@@ -29,7 +29,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         favicon: "./assets/favicon.png"
     },
     extra: {
-        apiUrl: process.env.API_URL || "http://localhost:3000/api",
+        apiUrl: process.env.API_URL || "https://lms-api-diogo-camacho.vercel.app/api",
         eas: {
             projectId: "21316696-caea-43d9-ad9d-e1fbace68855"
         }
