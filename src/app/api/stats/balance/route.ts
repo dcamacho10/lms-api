@@ -6,11 +6,18 @@ import { startOfYear, endOfYear, format, startOfMonth, endOfMonth } from "date-f
 
 export const runtime = "nodejs";
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
+        const { searchParams } = new URL(request.url);
+        const yearParam = searchParams.get("year");
+
         const now = new Date();
-        const yearStart = startOfYear(now);
-        const yearEnd = endOfYear(now);
+        const year = yearParam ? parseInt(yearParam) : now.getFullYear();
+
+        // Create dates in UTC to avoid timezone issues or use local time consistently
+        // Using local constructor ensures we look at the year in local time like the user expects
+        const yearStart = new Date(year, 0, 1);
+        const yearEnd = new Date(year, 11, 31, 23, 59, 59, 999);
 
         // Fetch loans issued this year
         const loansThisYear = await db
@@ -40,7 +47,7 @@ export async function GET() {
 
         // Process data into 12 months
         const monthlyData = Array.from({ length: 12 }, (_, i) => {
-            const date = new Date(now.getFullYear(), i, 1);
+            const date = new Date(year, i, 1);
             return {
                 month: format(date, "MMMM"),
                 monthShort: format(date, "MMM"),
@@ -75,7 +82,7 @@ export async function GET() {
         const totalRecovered = monthlyData.reduce((sum, m) => sum + m.recovered, 0);
 
         return NextResponse.json({
-            year: now.getFullYear(),
+            year: year,
             totalLoaned,
             totalEarnings,
             totalRecovered,

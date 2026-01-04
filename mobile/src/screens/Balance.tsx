@@ -1,17 +1,18 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, FlatList, Dimensions } from 'react-native';
-import { Card, Title, Paragraph, Text, ActivityIndicator, Divider, Surface, useTheme } from 'react-native-paper';
+import { View, StyleSheet, ScrollView, FlatList, Dimensions, TouchableOpacity } from 'react-native';
+import { Card, Title, Paragraph, Text, ActivityIndicator, Divider, Surface, useTheme, IconButton } from 'react-native-paper';
 import { useQuery } from '@tanstack/react-query';
 import { getYearlyBalance } from '../api';
-import { TrendingUp, TrendingDown, DollarSign, Calendar } from 'lucide-react-native';
+import { TrendingUp, TrendingDown, DollarSign, Calendar, ChevronLeft, ChevronRight } from 'lucide-react-native';
 
 const screenWidth = Dimensions.get('window').width;
 
 export default function Balance() {
     const theme = useTheme();
+    const [selectedYear, setSelectedYear] = React.useState(new Date().getFullYear());
     const { data, isLoading, error } = useQuery({
-        queryKey: ['stats', 'balance'],
-        queryFn: getYearlyBalance,
+        queryKey: ['stats', 'balance', selectedYear],
+        queryFn: () => getYearlyBalance(selectedYear),
     });
 
     if (isLoading) return <ActivityIndicator style={styles.loader} />;
@@ -19,7 +20,17 @@ export default function Balance() {
 
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-            <Title style={styles.pageTitle}>Financial Overview {data?.year}</Title>
+            <View style={styles.header}>
+                <IconButton
+                    icon={() => <ChevronLeft size={24} color="#333" />}
+                    onPress={() => setSelectedYear(y => y - 1)}
+                />
+                <Title style={styles.pageTitle}>Financial Overview {selectedYear}</Title>
+                <IconButton
+                    icon={() => <ChevronRight size={24} color="#333" />}
+                    onPress={() => setSelectedYear(y => y + 1)}
+                />
+            </View>
 
             <View style={styles.summaryRow}>
                 <Surface style={[styles.summaryCard, { backgroundColor: '#f3e5f5' }]} elevation={1}>
@@ -148,10 +159,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
     pageTitle: {
         fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 20,
         color: '#6200ee',
     },
     summaryRow: {

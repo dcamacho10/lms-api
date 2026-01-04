@@ -49,7 +49,8 @@ export const applyFees = async () => {
     return response.data;
 };
 
-export const getYearlyBalance = async () => {
-    const response = await api.get('/stats/balance');
+export const getYearlyBalance = async (year?: number) => {
+    const params = year ? { year } : {};
+    const response = await api.get('/stats/balance', { params });
     return response.data;
 };

@@ -30,5 +30,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     },
     extra: {
         apiUrl: process.env.API_URL || "http://localhost:3000/api",
+        eas: {
+            projectId: "21316696-caea-43d9-ad9d-e1fbace68855"
+        }
+    },
+    updates: {
+        url: "https://u.expo.dev/21316696-caea-43d9-ad9d-e1fbace68855"
+    },
+    runtimeVersion: {
+        policy: "appVersion"
     },
 });
